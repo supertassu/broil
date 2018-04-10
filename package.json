@@ -2,11 +2,11 @@
   "name": "broil",
   "version": "1.0.0",
   "description": "Utility to create a projet with a broilerplate.",
-  "main": "src/cli.js",
+  "main": "src/index.js",
   "bin": "dist/cli.js",
   "scripts": {
     "start": "babel-node src/cli.js --repo supertassu/broilerplate --target project",
-    "test": "xo && ava",
+    "test": "xo && ava --verbose",
     "build": "npx babel src --out-dir dist"
   },
   "repository": {
@@ -28,18 +28,48 @@
     "ava": "^1.0.0-beta.3",
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1",
+    "babel-preset-es2015-node5": "^1.2.0",
+    "babel-preset-react": "^6.24.1",
+    "eslint-config-xo-react": "^0.16.0",
+    "eslint-plugin-react": "^7.7.0",
     "execa": "^0.10.0",
     "xo": "^0.20.3"
   },
   "dependencies": {
+    "@babel/plugin-transform-react-jsx": "^7.0.0-beta.44",
     "babel-polyfill": "^6.26.0",
     "chalk": "^2.3.2",
+    "github-short-url-regex": "^3.0.0",
     "ink": "^0.4.1",
-    "meow": "^4.0.0"
+    "ink-spinner": "^1.0.0",
+    "meow": "^4.0.0",
+    "prop-types": "^15.6.1"
   },
   "ava": {
     "files": [
       "src/**/*.test.js"
-    ]
+    ],
+    "require": [
+      "babel-register"
+    ],
+    "babel": {
+      "testOptions": {
+        "babelrc": false,
+        "presets": ["env"],
+        "plugins": [
+          ["transform-react-jsx", {
+            "pragma": "h"
+          }]
+        ]
+      }
+    }
+  },
+  "xo": {
+    "extends": "xo-react",
+    "settings": {
+      "react": {
+        "pragma": "h"
+      }
+    }
   }
 }
