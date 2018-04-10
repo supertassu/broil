@@ -51,7 +51,7 @@ if (!cli.flags.repo) {
 }
 
 // For unit testing
-if (cli.flags['skip-exec']) {
+if (cli.flags.skipExec) {
 	console.log('success');
 	process.exit(0);
 }
