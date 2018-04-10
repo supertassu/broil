@@ -1,0 +1,45 @@
+{
+  "name": "broil",
+  "version": "1.0.0",
+  "description": "Utility to create a projet with a broilerplate.",
+  "main": "src/cli.js",
+  "bin": "dist/cli.js",
+  "scripts": {
+    "start": "babel-node src/cli.js",
+    "test": "xo && ava",
+    "build": "npx babel src --out-dir dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/supertassu/broil.git"
+  },
+  "keywords": [
+    "boilerplate",
+    "cli",
+    "broilerplate"
+  ],
+  "author": "Tassu <hello@tassu.me>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/supertassu/broil/issues"
+  },
+  "homepage": "https://github.com/supertassu/broil#readme",
+  "devDependencies": {
+    "ava": "^1.0.0-beta.3",
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "execa": "^0.10.0",
+    "xo": "^0.20.3"
+  },
+  "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "chalk": "^2.3.2",
+    "ink": "^0.4.1",
+    "meow": "^4.0.0"
+  },
+  "ava": {
+    "files": [
+      "src/**/*.test.js"
+    ]
+  }
+}
