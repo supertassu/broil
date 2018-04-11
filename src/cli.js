@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 
 import 'babel-polyfill';
+import {createWriteStream, existsSync, mkdirSync} from 'fs';
+import {join} from 'path';
 import meow from 'meow';
 import regex from 'github-short-url-regex';
 import {Component, h, render, Text} from 'ink';
-import {State, Timer} from './cli-ui-util';
-import {createWriteStream} from 'fs';
 import request from 'request';
-import path from 'path';
 import Broil from '..';
+import {Parse as parse} from 'unzip';
+import {State, Timer} from './cli-ui-util';
 
 const cli = meow(`
     Usage
@@ -55,7 +56,7 @@ if (!cli.flags.repo) {
 } else if (Array.isArray(cli.flags.target)) {
 	console.error('multiple targets specified');
 	process.exit(1);
-} else if (!regex({exact: true}).test(cli.flags.repo)) { // Figure out how to add webstorm ignore comment without angering xo :P
+} else if (!regex({exact: true}).test(cli.flags.repo)) {
 	console.error('repository name is not valid');
 	process.exit(1);
 }
@@ -143,16 +144,72 @@ class Broiler extends Component {
 				}
 			});
 
-			const file = await createWriteStream(path.join(broil.directory, 'download.zip'));
-			request(broil.getUrl()).pipe(file);
+			await new Promise(resolve => {
+				new Promise((resolve, reject) => {
+					// eslint-disable-next-line capitalized-comments
+					// noinspection JSUnresolvedFunction
+					const stream = request(broil.getUrl())
+						.on('response', response => {
+							this.setState({
+								download: {
+									state: response.statusCode === 200 ? 'success' : 'failed',
+									err: `HTTP ${response.statusCode}`
+								},
+								extract: {
+									state: response.statusCode === 200 ? 'loading' : 'waiting',
+									err: null
+								}
+							});
 
-			console.log('downloaded');
+							if (response.statusCode === 200) {
+								resolve(stream);
+							} else {
+								reject();
+							}
+						});
+				}).then(stream => {
+					stream.pipe(parse())
+						.on('entry', entry => {
+							const fileName = entry.path;
+							if (entry.type.toLowerCase() === 'file') {
+								entry.pipe(createWriteStream(join(broil.directory, fileName.substring(fileName.indexOf('/') + 1))));
+							} else if (entry.type.toLowerCase() === 'directory') {
+								if (!existsSync(join(broil.directory, fileName.substring(fileName.indexOf('/') + 1)))) {
+									mkdirSync(join(broil.directory, fileName.substring(fileName.indexOf('/') + 1)));
+								}
+							}
+						})
+						.on('close', () => {
+							resolve();
+						});
+				}).catch(() => {
+					setTimeout(() => {
+						process.exit(1);
+					}, 500);
+				});
+			});
+
+			this.setState({
+				extract: {
+					state: 'success',
+					err: null
+				},
+				cleanup: {
+					state: 'success',
+					err: null
+				}
+			});
+
+			setTimeout(() => {
+				process.exit(0);
+			}, 500);
 		}, 250);
 	}
 }
 
-render((
-	<div>
-		<Broiler/>
-	</div>
-));
+render(
+	(
+		<div>
+			<Broiler/>
+		</div>
+	));

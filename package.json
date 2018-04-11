@@ -46,7 +46,8 @@
     "ink-spinner": "^1.0.0",
     "meow": "^4.0.0",
     "prop-types": "^15.6.1",
-    "request": "^2.85.0"
+    "request": "^2.85.0",
+    "unzip": "^0.1.11"
   },
   "ava": {
     "files": [
