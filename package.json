@@ -1,5 +1,5 @@
 {
-  "name": "broil",
+  "name": "broil-install",
   "version": "1.0.0",
   "description": "Utility to create a projet with a broilerplate.",
   "main": "dist/index.js",

@@ -13,15 +13,15 @@ import Broil from '.';
 
 const cli = meow(`
     Usage
-      $ broil --repo <user/repo> --name <target>
+      $ broil-install --repo <user/repo> --name <target>
  
     Options
       --target, -t  Specifies the github repository to clone from. (required)
       --repo,   -r  Specifies the folder to be cloned to.          (required)
  
     Examples
-      $ broil -r supertassu/broilerplate -t awesome-project
-      $ broil --repo supertassu/broilerplate-electron --target another-awesome-project
+      $ broil-install -r supertassu/broilerplate -t awesome-project
+      $ broil-install --repo supertassu/broilerplate-electron --target another-awesome-project
 `, {
 	flags: {
 		repo: {
