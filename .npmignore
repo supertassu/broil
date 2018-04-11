@@ -1,3 +1,6 @@
 package-lock.json
 test
-src/cli.js
+src
+project
+.babelrc
+.gitignore

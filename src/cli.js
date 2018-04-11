@@ -4,8 +4,10 @@ import 'babel-polyfill';
 import meow from 'meow';
 import regex from 'github-short-url-regex';
 import {Component, h, render, Text} from 'ink';
-import Spinner from 'ink-spinner';
-import PropTypes from 'prop-types';
+import {State, Timer} from './cli-ui-util';
+import {createWriteStream} from 'fs';
+import request from 'request';
+import path from 'path';
 import Broil from '..';
 
 const cli = meow(`
@@ -65,57 +67,92 @@ if (cli.flags.skipExec) {
 	process.exit(0);
 }
 
-/**
- * Possible loadingState values: waiting, loading, success, failed
- */
-class State extends Component {
+class Broiler extends Component {
+	constructor(props, context) {
+		super(props, context);
+		this.state = {
+			mkdir: {
+				state: 'waiting',
+				err: null
+			},
+			download: {
+				state: 'waiting',
+				err: null,
+				time: null
+			},
+			extract: {
+				state: 'waiting',
+				err: null
+			},
+			cleanup: {
+				state: 'waiting',
+				err: null
+			}
+		};
+	}
+
 	render() {
-		if (this.props.loadingState === 'waiting') {
-			return (
-				<div>
-					<Text orange>·</Text> {this.props.text}
-				</div>
-			);
-		}
-
-		if (this.props.loadingState === 'loading') {
-			return (
-				<div>
-					<Spinner yellow/> {this.props.text}
-				</div>
-			);
-		}
-
-		if (this.props.loadingState === 'success') {
-			return (
-				<div>
-					<Text green>✔</Text> {this.props.text}
-				</div>
-			);
-		}
-
 		return (
 			<div>
-				<Text red>✖</Text> {this.props.text}
+				<State loadingState={this.state.mkdir.state} text="Creating directory..." error={this.state.mkdir.err}/>
+				<State loadingState={this.state.download.state} text="Downloading files..." error={this.state.download.err} info={this.state.download.time}/>
+				<State loadingState={this.state.extract.state} text="Extracting files..." error={this.state.extract.err}/>
+				<State loadingState={this.state.cleanup.state} text="Cleaning up..." error={this.state.cleanup.err}/>
+				<br/>
+				<Text green><Timer/> seconds elapsed</Text>
 			</div>
 		);
 	}
-}
 
-State.propTypes = {
-	loadingState: PropTypes.string.isRequired,
-	text: PropTypes.string.isRequired
-};
+	componentDidMount() {
+		setTimeout(async () => {
+			const broil = new Broil(cli.flags.repo, cli.flags.target);
+
+			this.setState({
+				mkdir: {
+					state: 'loading',
+					err: null
+				}
+			});
+
+			const {status, message} = broil.validateDirectory();
+
+			if (status !== true) {
+				this.setState({
+					mkdir: {
+						state: 'failed',
+						err: message
+					}
+				});
+
+				setTimeout(() => {
+					process.exit(1);
+				}, 500);
+
+				return;
+			}
+
+			this.setState({
+				mkdir: {
+					state: 'success',
+					err: 'success'
+				},
+				download: {
+					state: 'loading',
+					err: null
+				}
+			});
+
+			const file = await createWriteStream(path.join(broil.directory, 'download.zip'));
+			request(broil.getUrl()).pipe(file);
+
+			console.log('downloaded');
+		}, 250);
+	}
+}
 
 render((
 	<div>
-		<State loadingState="waiting" text="Waiting.."/>
-		<State loadingState="success" text="Another loader."/>
-		<State loadingState="loading" text="A moment.."/>
-		<State loadingState="failed" text="It failed."/>
+		<Broiler/>
 	</div>
 ));
-
-const broiler = new Broil(cli.flags.repo);
-
-console.log(broiler);

@@ -30,9 +30,11 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-es2015-node5": "^1.2.0",
     "babel-preset-react": "^6.24.1",
+    "clear-module": "^2.1.0",
     "eslint-config-xo-react": "^0.16.0",
     "eslint-plugin-react": "^7.7.0",
     "execa": "^0.10.0",
+    "strip-ansi": "latest",
     "xo": "^0.20.3"
   },
   "dependencies": {
@@ -43,11 +45,12 @@
     "ink": "^0.4.1",
     "ink-spinner": "^1.0.0",
     "meow": "^4.0.0",
-    "prop-types": "^15.6.1"
+    "prop-types": "^15.6.1",
+    "request": "^2.85.0"
   },
   "ava": {
     "files": [
-      "src/**/*.test.js"
+      "test/**/*.test.js"
     ],
     "require": [
       "babel-register"
@@ -55,11 +58,16 @@
     "babel": {
       "testOptions": {
         "babelrc": false,
-        "presets": ["env"],
+        "presets": [
+          "env"
+        ],
         "plugins": [
-          ["transform-react-jsx", {
-            "pragma": "h"
-          }]
+          [
+            "transform-react-jsx",
+            {
+              "pragma": "h"
+            }
+          ]
         ]
       }
     }
