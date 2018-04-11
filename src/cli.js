@@ -7,9 +7,9 @@ import meow from 'meow';
 import regex from 'github-short-url-regex';
 import {Component, h, render, Text} from 'ink';
 import request from 'request';
-import Broil from '..';
 import {Parse as parse} from 'unzip';
 import {State, Timer} from './cli-ui-util';
+import Broil from '.';
 
 const cli = meow(`
     Usage
@@ -17,12 +17,11 @@ const cli = meow(`
  
     Options
       --target, -t  Specifies the github repository to clone from. (required)
-      --repo,   -r    Specifies the folder to be cloned to.        (required)
-      --keep-git  Do not remove .git from cloned repository
+      --repo,   -r  Specifies the folder to be cloned to.          (required)
  
     Examples
       $ broil -r supertassu/broilerplate -t awesome-project
-      $ broil --repo supertassu/broilerplate-electron --target another-awesome-project --keep-git
+      $ broil --repo supertassu/broilerplate-electron --target another-awesome-project
 `, {
 	flags: {
 		repo: {
@@ -32,9 +31,6 @@ const cli = meow(`
 		target: {
 			type: 'string',
 			alias: 't'
-		},
-		'keep-git': {
-			type: 'boolean'
 		},
 		'skip-exec': {
 			type: 'boolean'

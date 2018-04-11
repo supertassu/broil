@@ -1,6 +1,5 @@
-package-lock.json
-test
 src
-project
+test
 .babelrc
-.gitignore
+broil-*.tgz
+.idea
